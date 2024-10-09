@@ -5,16 +5,25 @@ from linebot.v3.messaging import Configuration, ApiClient, MessagingApi, ReplyMe
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
 import firebase_admin
 from firebase_admin import credentials, firestore
+import json
+import os
+from dotenv import load_dotenv
+
+# 載入 .env 檔案
+load_dotenv()
 
 app = Flask(__name__)
 
+# 從環境變數中讀取 JSON 檔案內容
+service_account_info = json.loads(os.getenv("GOOGLE_APPLICATION_CREDENTIALS_JSON"))
+
 # 初始化 Firebase Admin SDK
-cred = credentials.Certificate("src/secret2.json")
+cred = credentials.Certificate(service_account_info)
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-configuration = Configuration(access_token='8FVnTB32GckGEmhBpaMsL14703eeNAVVu1CTCNgKs8rrZgPqM29tcRHbfIRphS/rb7gXfg5N0O3b556wMe7+vVOaRtAx0e3IeBdCIzg+1TRcokpu2CMJkfMlw8pJ0B7Sjx1l/XXrJe8qPPfHaEz1FwdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('d4b7963c257240af6564ccaf2e1730dc')
+configuration = Configuration(access_token=os.getenv('LINE_CHANNEL_ACCESS_TOKEN'))
+handler = WebhookHandler(os.getenv('LINE_CHANNEL_SECRET'))
 
 user_states = {}
 
